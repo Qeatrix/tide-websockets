@@ -22,12 +22,12 @@ pub struct WebSocketConnection(
 impl WebSocketConnection {
     /// Sends a string message to the connected websocket client. This is equivalent to `.send(Message::Text(string))`
     pub async fn send_string(&self, string: String) -> async_tungstenite::tungstenite::Result<()> {
-        self.send(Message::Text(string)).await
+        self.send(Message::Text(string.into())).await
     }
 
     /// Sends a binary message to the connected websocket client. This is equivalent to `.send(Message::Binary(bytes))`
     pub async fn send_bytes(&self, bytes: Vec<u8>) -> async_tungstenite::tungstenite::Result<()> {
-        self.send(Message::Binary(bytes)).await
+        self.send(Message::Binary(bytes.into())).await
     }
 
     /// Sends a [`Message`] to the client
@@ -43,7 +43,7 @@ impl WebSocketConnection {
     }
 
     pub(crate) fn new(ws: WebSocketStream<Connection>) -> Self {
-        let (s, r) = ws.split();
+        let (s, r) = StreamExt::split(ws);
         Self(Arc::new(Mutex::new(s)), Arc::new(Mutex::new(r)))
     }
 }
